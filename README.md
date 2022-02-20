@@ -6,12 +6,16 @@ This repo is a simple clone of it that has been built using Python and can be pl
 
 ## Installation
 Only 3rd party package that is used for this project is `colorama`. So to install the dependencies, run:
-```pip install -r requirements.txt```
+```
+pip install -r requirements.txt
+```
 This project requires Python 3.7+
 
 ## How to run
 To run the program, run:
-```python play_wordle.py```
+```
+python play_wordle.py
+```
 That's it! Rules are the same as the original wordle game. Have fun!
 
 ## Possible Improvements
