@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import List
+from typing import Dict
 from .wordle import Wordle, Letter
 
 from colorama import Fore
@@ -78,14 +78,14 @@ class Interface:
         for _ in range(self.wordle.MAX_ATTEMPTS - len(self.wordle.attempts)):
             print(" ".join(["_"] * self.wordle.MAX_WORD_LENGTH))
 
-    def add_color(self, attempt: List[Letter]) -> str:
+    def add_color(self, attempt: Dict[int, Letter]) -> str:
         """Function to add color to an attempt"""
 
         # Colored characters
         colored_guess = []
 
         # Color each character in the guess and append it to the list
-        for letter in attempt:
+        for _, letter in sorted(attempt.items(), key=lambda x: x[0]):
             if letter.correct_position:
                 color = Fore.GREEN
             elif letter.in_word:

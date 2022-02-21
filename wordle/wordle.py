@@ -1,6 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import List
+from typing import Dict, List
 
 
 class Wordle:
@@ -13,7 +13,7 @@ class Wordle:
         self.word = word.upper()
 
         # List of attempts that have been made so far
-        self.attempts: List[List[Letter]] = []
+        self.attempts: List[Dict[int, Letter]] = []
 
     @property
     def won(self) -> bool:
@@ -26,7 +26,7 @@ class Wordle:
     def __correct_guess(self) -> bool:
         """Checks if the most recent guess is correct"""
         guess_states = self.attempts[-1]
-        guess = "".join([str(guess) for guess in guess_states])
+        guess = "".join([str(word) for _, word in sorted(guess_states.items())])
         return guess == self.word
 
     @property
@@ -37,10 +37,29 @@ class Wordle:
     def add_attempt(self, attempt: str):
         """Adds the state of each letter for a guess to the attempts collection"""
 
-        attempt_state = []
+        # Get the frequency of the word
+        freq: Dict[str, int] = {}
+        for ch in self.word:
+            freq[ch] = freq.get(ch, 0) + 1
+
+        # Empty dict to hold the state of each letter at a given index
+        attempt_state = dict()
+
+        # Loop through the guess, only mark down letters that are abs correct, they take
+        # precedence
         for index, ch in enumerate(attempt):
-            state = Letter(ch, ch in self.word, self.word[index] == attempt[index])
-            attempt_state.append(state)
+            if self.word[index] == ch:
+                attempt_state[index] = Letter(ch, False, True)
+                freq[ch] -= 1
+
+        # Mark the remaining letters, first occurence of a letter in the word in the
+        # wrong place gets precedence over any later occurences of a letter in the word
+        # in the wrong place
+        for index, ch in enumerate(attempt):
+            if index in attempt_state.keys():
+                continue
+            attempt_state[index] = Letter(ch, freq.get(ch, 0) > 0 and ch in self.word)
+            freq[ch] = freq.get(ch, 0) - 1
 
         self.attempts.append(attempt_state)
 
